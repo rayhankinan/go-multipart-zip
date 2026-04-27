@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/dustin/go-humanize"
 	"github.com/mholt/archives"
@@ -13,14 +14,21 @@ import (
 )
 
 var UnzipCmd = &cobra.Command{
-	Use:   "unzip",
-	Short: "Unzip multi-part zip files",
-	Long:  "Unzip multi-part zip files. For example, if you have a zip file named 'archive.zip' that is split into multiple parts (e.g., 'archive.zip.001', 'archive.zip.002', etc.), you can use this command to unzip the files.",
+	Use:                   "unzip pattern",
+	Short:                 "Unzip multi-part zip files",
+	Long:                  "Unzip multi-part zip files. For example, if you have a zip file named 'archive.zip' that is split into multiple parts (e.g., 'archive.zip.001', 'archive.zip.002', etc.), you can use this command to unzip the files.",
+	Args:                  cobra.ExactArgs(1),
+	DisableFlagsInUseLine: true,
 	Run: func(cmd *cobra.Command, args []string) {
-		singleReaders := make([]readerutil.SizeReaderAt, 0, len(args))
+		pattern := args[0]
+		matchingFiles, err := filepath.Glob(pattern)
+		if err != nil {
+			log.Fatalf("Error globbing files: %v", err)
+		}
 
-		for _, arg := range args {
-			f, err := os.Open(arg)
+		singleReaders := make([]readerutil.SizeReaderAt, 0, len(args))
+		for _, matchingFile := range matchingFiles {
+			f, err := os.Open(matchingFile)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -28,7 +36,7 @@ var UnzipCmd = &cobra.Command{
 
 			stats, err := f.Stat()
 			if err != nil {
-				log.Fatalf("Could not stat file: %s, error: %v", arg, err)
+				log.Fatalf("Could not stat file: %s, error: %v", matchingFile, err)
 			}
 
 			singleReaders = append(singleReaders, io.NewSectionReader(f, 0, stats.Size()))
