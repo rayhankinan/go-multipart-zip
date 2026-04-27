@@ -20,6 +20,7 @@ var UnzipCmd = &cobra.Command{
 	Args:                  cobra.ExactArgs(1),
 	DisableFlagsInUseLine: true,
 	Run: func(cmd *cobra.Command, args []string) {
+		ctx := cmd.Context()
 		pattern := args[0]
 		matchingFiles, err := filepath.Glob(pattern)
 		if err != nil {
@@ -48,7 +49,7 @@ var UnzipCmd = &cobra.Command{
 		format := archives.Zip{}
 
 		if err := format.Extract(
-			cmd.Context(),
+			ctx,
 			sequentialReader,
 			func(ctx context.Context, info archives.FileInfo) error {
 				log.Printf("Extracting: %s, size: %s", info.Name(), humanize.Bytes(uint64(info.Size())))
