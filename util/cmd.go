@@ -9,7 +9,6 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/mholt/archives"
 	"github.com/spf13/cobra"
-	"github.com/yeka/zip"
 	"go4.org/readerutil"
 )
 
@@ -18,11 +17,6 @@ var UnzipCmd = &cobra.Command{
 	Short: "Unzip multi-part zip files",
 	Long:  "Unzip multi-part zip files. For example, if you have a zip file named 'archive.zip' that is split into multiple parts (e.g., 'archive.zip.001', 'archive.zip.002', etc.), you can use this command to unzip the files.",
 	Run: func(cmd *cobra.Command, args []string) {
-		password, err := cmd.Flags().GetString("password")
-		if err != nil {
-			log.Fatalf("Error getting password flag: %v", err)
-		}
-
 		singleReaders := make([]readerutil.SizeReaderAt, 0, len(args))
 
 		for _, arg := range args {
@@ -40,19 +34,10 @@ var UnzipCmd = &cobra.Command{
 			singleReaders = append(singleReaders, io.NewSectionReader(f, 0, size))
 		}
 
-		// TODO: We need to remove local file header signatures from the multi-reader, otherwise the zip format will be invalid.
-		// This is because each part of the multi-part zip file may contain its own local file header signature, which can cause issues when trying to extract the files.
-		// We need to ensure that we only have one local file header signature at the beginning of the multi-reader, and that any subsequent signatures are removed or ignored.
-
-		// Reference: https://git.zx2c4.com/BruteZip/about/
-
 		multiReader := readerutil.NewMultiReaderAt(singleReaders...)
 		sequentialReader := io.NewSectionReader(multiReader, 0, multiReader.Size())
 
-		format := Zip{
-			Password:         password,
-			EncryptionMethod: zip.AES256Encryption,
-		}
+		format := archives.Zip{}
 
 		if err := format.Extract(
 			cmd.Context(),
@@ -66,8 +51,4 @@ var UnzipCmd = &cobra.Command{
 			log.Fatalf("Error extracting zip file: %v", err)
 		}
 	},
-}
-
-func init() {
-	UnzipCmd.Flags().StringP("password", "p", "", "Password for encrypted zip files")
 }

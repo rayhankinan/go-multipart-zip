@@ -6,7 +6,6 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/mholt/archives v0.1.5
 	github.com/spf13/cobra v1.10.2
-	github.com/yeka/zip v0.0.0-20231116150916-03d6312748a9
 	go4.org v0.0.0-20230225012048-214862532bf5
 )
 
@@ -29,6 +28,5 @@ require (
 	github.com/spf13/afero v1.15.0 // indirect
 	github.com/spf13/pflag v1.0.9 // indirect
 	github.com/ulikunitz/xz v0.5.15 // indirect
-	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	golang.org/x/text v0.29.0 // indirect
 )
