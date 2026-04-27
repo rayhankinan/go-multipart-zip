@@ -26,12 +26,12 @@ var UnzipCmd = &cobra.Command{
 			}
 			defer f.Close()
 
-			size, ok := readerutil.Size(f)
-			if !ok {
-				log.Fatalf("Could not determine size of file: %s", arg)
+			stats, err := f.Stat()
+			if err != nil {
+				log.Fatalf("Could not stat file: %s, error: %v", arg, err)
 			}
 
-			singleReaders = append(singleReaders, io.NewSectionReader(f, 0, size))
+			singleReaders = append(singleReaders, io.NewSectionReader(f, 0, stats.Size()))
 		}
 
 		multiReader := readerutil.NewMultiReaderAt(singleReaders...)
