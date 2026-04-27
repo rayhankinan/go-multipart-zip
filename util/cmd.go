@@ -44,6 +44,8 @@ var UnzipCmd = &cobra.Command{
 		// This is because each part of the multi-part zip file may contain its own local file header signature, which can cause issues when trying to extract the files.
 		// We need to ensure that we only have one local file header signature at the beginning of the multi-reader, and that any subsequent signatures are removed or ignored.
 
+		// Reference: https://git.zx2c4.com/BruteZip/about/
+
 		multiReader := readerutil.NewMultiReaderAt(singleReaders...)
 		sequentialReader := io.NewSectionReader(multiReader, 0, multiReader.Size())
 
