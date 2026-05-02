@@ -47,6 +47,22 @@ var UnzipCmd = &cobra.Command{
 			}
 
 			log.Printf("Extracting: %s (%s)", f.Name, humanize.Bytes(uint64(f.UncompressedSize64)))
+
+			rc, err := f.Open()
+			if err != nil {
+				log.Fatalf("Error opening file in zip: %v", err)
+			}
+			defer rc.Close()
+
+			outFile, err := os.Create(f.Name)
+			if err != nil {
+				log.Fatalf("Error creating output file: %v", err)
+			}
+			defer outFile.Close()
+
+			if _, err := io.Copy(outFile, rc); err != nil {
+				log.Fatalf("Error writing to output file: %v", err)
+			}
 		}
 	},
 }
