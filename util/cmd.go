@@ -27,7 +27,7 @@ var UnzipCmd = &cobra.Command{
 			log.Fatalf("Error globbing files: %v", err)
 		}
 
-		singleReaders := make([]readerutil.SizeReaderAt, 0, len(args))
+		singleReaders := make([]readerutil.SizeReaderAt, 0, len(matchingFiles))
 		for _, matchingFile := range matchingFiles {
 			f, err := os.Open(matchingFile)
 			if err != nil {
