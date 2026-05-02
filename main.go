@@ -3,8 +3,6 @@ package main
 import (
 	"go-multipart-zip/util"
 	"log"
-
-	"github.com/spf13/cobra"
 )
 
 func init() {
@@ -12,10 +10,7 @@ func init() {
 }
 
 func main() {
-	rootCmd := &cobra.Command{}
-	rootCmd.AddCommand(util.UnzipCmd)
-
-	if err := rootCmd.Execute(); err != nil {
+	if err := util.UnzipCmd.Execute(); err != nil {
 		log.Fatalf("Error executing command: %v", err)
 	}
 }

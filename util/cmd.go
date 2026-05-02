@@ -13,7 +13,7 @@ import (
 var UnzipCmd = &cobra.Command{
 	Use:   "unzip",
 	Short: "Unzip multi-part zip files",
-	Long:  "Unzip multi-part zip files. For example, if you have a zip file named 'archive.zip' that is split into multiple parts (e.g., 'archive.zip.001', 'archive.zip.002', etc.), you can use this command to unzip the files.",
+	Long:  "Unzip multi-part zip files. For example, if you have a zip file named 'archive.zip' that is split into multiple parts (e.g., 'archive.z01', 'archive.z02', ..., and 'archive.zip'), you can use this command to unzip the files.",
 	Run: func(cmd *cobra.Command, args []string) {
 		password, err := cmd.Flags().GetString("password")
 		if err != nil {
