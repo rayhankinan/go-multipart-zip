@@ -21,8 +21,8 @@ var UnzipCmd = &cobra.Command{
 		}
 
 		singleReaders := make([]zip.SizeReaderAt, 0, len(args))
-		for _, matchingFile := range args {
-			f, err := os.Open(matchingFile)
+		for _, arg := range args {
+			f, err := os.Open(arg)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -30,7 +30,7 @@ var UnzipCmd = &cobra.Command{
 
 			stats, err := f.Stat()
 			if err != nil {
-				log.Fatalf("Could not stat file: %s, error: %v", matchingFile, err)
+				log.Fatalf("Could not stat file: %s, error: %v", arg, err)
 			}
 
 			singleReaders = append(singleReaders, io.NewSectionReader(f, 0, stats.Size()))
