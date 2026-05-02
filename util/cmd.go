@@ -1,15 +1,13 @@
 package util
 
 import (
-	"context"
 	"io"
 	"log"
 	"os"
 
+	"github.com/KirCute/zip"
 	"github.com/dustin/go-humanize"
-	"github.com/mholt/archives"
 	"github.com/spf13/cobra"
-	"go4.org/readerutil"
 )
 
 var UnzipCmd = &cobra.Command{
@@ -18,9 +16,12 @@ var UnzipCmd = &cobra.Command{
 	Long:                  "Unzip multi-part zip files. For example, if you have a zip file named 'archive.zip' that is split into multiple parts (e.g., 'archive.zip.001', 'archive.zip.002', etc.), you can use this command to unzip the files.",
 	DisableFlagsInUseLine: true,
 	Run: func(cmd *cobra.Command, args []string) {
-		ctx := cmd.Context()
+		password, err := cmd.Flags().GetString("password")
+		if err != nil {
+			log.Fatalf("Error getting password flag: %v", err)
+		}
 
-		singleReaders := make([]readerutil.SizeReaderAt, 0, len(args))
+		singleReaders := make([]zip.SizeReaderAt, 0, len(args))
 		for _, matchingFile := range args {
 			f, err := os.Open(matchingFile)
 			if err != nil {
@@ -36,21 +37,21 @@ var UnzipCmd = &cobra.Command{
 			singleReaders = append(singleReaders, io.NewSectionReader(f, 0, stats.Size()))
 		}
 
-		multiReader := readerutil.NewMultiReaderAt(singleReaders...)
-		sequentialReader := io.NewSectionReader(multiReader, 0, multiReader.Size())
+		multiReader, err := zip.NewMultipartReader(singleReaders)
+		if err != nil {
+			log.Fatalf("Error creating multi-part reader: %v", err)
+		}
 
-		format := archives.Zip{}
+		for _, f := range multiReader.File {
+			if f.IsEncrypted() {
+				f.SetPassword(password)
+			}
 
-		if err := format.Extract(
-			ctx,
-			sequentialReader,
-			func(ctx context.Context, info archives.FileInfo) error {
-				log.Printf("Extracting: %s, size: %s", info.Name(), humanize.Bytes(uint64(info.Size())))
-
-				return nil
-			},
-		); err != nil {
-			log.Fatalf("Error extracting zip file: %v", err)
+			log.Printf("Extracting: %s (%s)", f.Name, humanize.Bytes(uint64(f.UncompressedSize64)))
 		}
 	},
+}
+
+func init() {
+	UnzipCmd.Flags().StringP("password", "p", "", "Password for encrypted zip files")
 }
