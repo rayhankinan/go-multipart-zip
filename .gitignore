@@ -31,5 +31,5 @@ go.work.sum
 # .idea/
 # .vscode/
 
-# Test data
-testdata/
+# Environment variable files
+application.yaml
