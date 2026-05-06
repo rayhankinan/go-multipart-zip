@@ -41,7 +41,6 @@ var Cmd = &cobra.Command{
 			if err != nil {
 				log.Fatalf("Error creating GCS reader: %v", err)
 			}
-
 			singleReaders = append(singleReaders, singleReader)
 		}
 

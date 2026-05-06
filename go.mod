@@ -4,7 +4,7 @@ go 1.25.5
 
 require (
 	cloud.google.com/go/storage v1.56.0
-	github.com/Match-Made/zip v0.0.0-20260505155330-33319dc35b8e
+	github.com/Match-Made/zip v0.0.0-20260506080157-818af34410bc
 	github.com/dustin/go-humanize v1.0.1
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
